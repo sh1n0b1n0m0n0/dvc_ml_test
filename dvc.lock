@@ -18,3 +18,70 @@ stages:
       md5: 153aad06d376b6595932470e459ef42a.dir
       size: 8447363
       nfiles: 2
+  featurize:
+    cmd: python src/featurization.py data/prepared data/features
+    deps:
+    - path: data/prepared
+      md5: 153aad06d376b6595932470e459ef42a.dir
+      size: 8447363
+      nfiles: 2
+    - path: src/featurization.py
+      md5: 400b3aa6627de17d1ac8be02ebc45c5d
+      size: 2486
+    params:
+      params.yaml:
+        featurize.max_features: 100
+        featurize.ngrams: 1
+    outs:
+    - path: data/features
+      md5: 4a2a087b3a03359450bf46b607944f2c.dir
+      size: 1557044
+      nfiles: 2
+  train:
+    cmd: python src/train.py data/features model.pkl
+    deps:
+    - path: data/features
+      md5: 4a2a087b3a03359450bf46b607944f2c.dir
+      size: 1557044
+      nfiles: 2
+    - path: src/train.py
+      md5: c3961d777cfbd7727f9fde4851896006
+      size: 967
+    params:
+      params.yaml:
+        train.min_split: 0.01
+        train.n_est: 50
+        train.seed: 20170428
+    outs:
+    - path: model.pkl
+      md5: e4ab3203c0b38afd5ffac1793fa58a60
+      size: 1677271
+  evaluate:
+    cmd: python src/evaluate.py model.pkl data/features
+    deps:
+    - path: data/features
+      md5: 4a2a087b3a03359450bf46b607944f2c.dir
+      size: 1557044
+      nfiles: 2
+    - path: model.pkl
+      md5: e4ab3203c0b38afd5ffac1793fa58a60
+      size: 1677271
+    - path: src/evaluate.py
+      md5: 44e714021a65edf881b1716e791d7f59
+      size: 2346
+    outs:
+    - path: evaluation.json
+      md5: fc0d2308a2f60a916dd67c8435a79d33
+      size: 76
+    - path: evaluation/importance.png
+      md5: 400d0e42f50b0d9987da48b32f39e270
+      size: 29331
+    - path: evaluation/plots/confusion_matrix.json
+      md5: 38c0fe3deeb244747ead298413feca52
+      size: 130263
+    - path: evaluation/plots/precision_recall.json
+      md5: 72e1b5de02ad55e0aeb315d66761a655
+      size: 150745
+    - path: evaluation/plots/roc.json
+      md5: 5fe616de8de5ecf99a92bbf102d22482
+      size: 46580
